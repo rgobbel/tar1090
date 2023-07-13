@@ -118,6 +118,7 @@ let triggerRefresh = 0;
 let firstDraw = true;
 let darkerColors = false;
 let autoselect = false;
+let autoselectTime = 1000;
 let nogpsOnly = false;
 let trace_hist_only = false;
 let traces_high_res = false;
@@ -949,6 +950,18 @@ function initPage() {
         },
     });
     setGlobalScale(userScale, "init");
+
+    jQuery('#autoselTimeSlider').slider({
+	value: autoselectTime,
+	step: 0.5,
+	min: 0.5,
+	max: 5,
+        change: function(event, ui) {
+	    autoselectTime = ui.value;
+            mapRefresh();
+            loStore['autoselectTime'] = autoselectTime;
+        },
+    });
 
     if (usp.has('hideButtons'))
         hideButtons = true;
@@ -7893,7 +7906,7 @@ function setAutoselect() {
     clearInterval(timers.autoselect);
     if (!autoselect)
         return;
-    timers.autoselect = window.setInterval(selectClosest, 5000);
+    timers.autoselect = window.setInterval(selectClosest, autoselectTime);
     selectClosest();
 }
 function registrationLink(plane) {
