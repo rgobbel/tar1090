@@ -118,7 +118,7 @@ let triggerRefresh = 0;
 let firstDraw = true;
 let darkerColors = false;
 let autoselect = false;
-let autoselectTime = 1000;
+// let autoselectTime = 1000;
 let nogpsOnly = false;
 let trace_hist_only = false;
 let traces_high_res = false;
@@ -951,17 +951,17 @@ function initPage() {
     });
     setGlobalScale(userScale, "init");
 
-    jQuery('#autoselTimeSlider').slider({
-	value: autoselectTime/1000,
-	step: 0.5,
-	min: 0.5,
-	max: 5,
-        change: function(event, ui) {
-	    autoselectTime = ui.value*1000;
-            mapRefresh();
-            loStore['autoselectTime'] = autoselectTime;
-        },
-    });
+    // jQuery('#autoselTimeSlider').slider({
+    // 	value: autoselectTime/1000,
+    // 	step: 0.5,
+    // 	min: 0.5,
+    // 	max: 5,
+    //     change: function(event, ui) {
+    // 	    autoselectTime = ui.value*1000;
+    //         mapRefresh();
+    //         loStore['autoselectTime'] = autoselectTime;
+    //     },
+    // });
 
     if (usp.has('hideButtons'))
         hideButtons = true;
@@ -7886,17 +7886,19 @@ function selectClosest() {
     checkMovement();
     for (let key in g.planesOrdered) {
         const plane = g.planesOrdered[key];
-        if (!closest)
-            closest = plane;
-        if (plane.position == null || !plane.visible)
-            continue;
-        const dist = ol.sphere.getDistance([CenterLon, CenterLat], plane.position);
-        if (dist == null || isNaN(dist))
-            continue;
-        if (closestDistance == null || dist < closestDistance) {
-            closestDistance = dist;
-            closest = plane;
-        }
+	if (plane.seen < 10) {
+            if (!closest)
+		closest = plane;
+            if (plane.position == null || !plane.visible)
+		continue;
+            const dist = ol.sphere.getDistance([CenterLon, CenterLat], plane.position);
+            if (dist == null || isNaN(dist))
+		continue;
+            if (closestDistance == null || dist < closestDistance) {
+		closestDistance = dist;
+		closest = plane;
+            }
+	}
     }
     if (!closest)
         return;
@@ -7906,7 +7908,7 @@ function setAutoselect() {
     clearInterval(timers.autoselect);
     if (!autoselect)
         return;
-    timers.autoselect = window.setInterval(selectClosest, autoselectTime);
+    timers.autoselect = window.setInterval(selectClosest, 1000);
     selectClosest();
 }
 function registrationLink(plane) {
