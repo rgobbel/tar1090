@@ -5,8 +5,65 @@
 
 "use strict";
 
+class Node {
+  constructor(val, distance) {
+    this.value = val;
+    this.distance = distance;
+    this.next = null;
+  }
+}
+
+class DistPriorityQueue {
+    constructor() {
+	this.heap = [null]
+    }
+    
+    insert(value, distance) {
+	const newNode = new Node(value, distance);
+	this.heap.push(newNode);
+	let currentNodeIdx = this.heap.length - 1;
+	let currentNodeParentIdx = Math.floor(currentNodeIdx / 2);
+	while (
+	    this.heap[currentNodeParentIdx] &&
+		newNode.distance < this.heap[currentNodeParentIdx].distance
+	) {
+	    const parent = this.heap[currentNodeParentIdx];
+	    this.heap[currentNodeParentIdx] = newNode;
+	    this.heap[currentNodeIdx] = parent;
+	    currentNodeIdx = currentNodeParentIdx;
+	    currentNodeParentIdx = Math.floor(currentNodeIdx / 2);
+	}
+    }
+    
+    remove() {
+	if (this.heap.length < 3) {
+	    const toReturn = this.heap.pop();
+	    this.heap[0] = null;
+	    return toReturn;
+	}
+	const toRemove = this.heap[1];
+	this.heap[1] = this.heap.pop();
+	let currentIdx = 1;
+	let [left, right] = [2*currentIdx, 2*currentIdx + 1];
+	let currentChildIdx = this.heap[right] && this.heap[right].distance >= this.heap[left].distance ? right : left;
+	while (this.heap[currentChildIdx] && this.heap[currentIdx].distance <= this.heap[currentChildIdx].distance) {
+	    let currentNode = this.heap[currentIdx]
+	    let currentChildNode = this.heap[currentChildIdx];
+	    this.heap[currentChildIdx] = currentNode;
+	    this.heap[currentIdx] = currentChildNode;
+	}
+	return toRemove;
+    }
+
+    peek() {
+	return this.heap[1].value;
+    }
+    
+}
+
 g.planes        = {};
 g.planesOrdered = [];
+g.distQueue = new DistPriorityQueue();
 g.route_cache = [];
 g.route_check_array = [];
 g.route_check_in_flight = false;
@@ -2110,6 +2167,7 @@ function webglAddLayer() {
     }
     delete g.planes[plane.icao];
     g.planesOrdered.splice(g.planesOrdered.indexOf(plane), 1);
+    g.distPriorityQueue.remove(plane);
     plane.destroy();
 
     if (icaoFilter != null) {
@@ -7906,7 +7964,7 @@ function setAutoselect() {
     clearInterval(timers.autoselect);
     if (!autoselect)
         return;
-    timers.autoselect = window.setInterval(selectClosest, 1000);
+    timers.autoselect = window.setInterval(selectClosest, 2000);
     selectClosest();
 }
 function registrationLink(plane) {
