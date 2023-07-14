@@ -7901,7 +7901,7 @@ function selectClosest() {
 	}
     }
     if (!closest)
-        return;
+        deselectAllPlanes();
     selectPlaneByHex(closest.icao, {noDeselect: true, follow: FollowSelected,});
 }
 function setAutoselect() {
