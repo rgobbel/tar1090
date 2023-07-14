@@ -7886,7 +7886,7 @@ function selectClosest() {
     checkMovement();
     for (let key in g.planesOrdered.reverse()) {
         const plane = g.planesOrdered[key];
-	if (plane.seen < 10) {
+	if (!plane.onGround && plane.seen < 10) {
             if (!closest)
 		closest = plane;
             if (plane.position == null || !plane.visible)
