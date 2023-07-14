@@ -952,12 +952,12 @@ function initPage() {
     setGlobalScale(userScale, "init");
 
     jQuery('#autoselTimeSlider').slider({
-	value: autoselectTime,
+	value: autoselectTime/1000,
 	step: 0.5,
 	min: 0.5,
 	max: 5,
         change: function(event, ui) {
-	    autoselectTime = ui.value;
+	    autoselectTime = ui.value*1000;
             mapRefresh();
             loStore['autoselectTime'] = autoselectTime;
         },
