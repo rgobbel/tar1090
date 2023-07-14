@@ -7884,21 +7884,19 @@ function selectClosest() {
     let closest = null;
     let closestDistance = null;
     checkMovement();
-    for (let key in g.planesOrdered.reverse()) {
+    for (let key in g.planesOrdered) {
         const plane = g.planesOrdered[key];
-	if (!plane.onGround && plane.seen < 10) {
-            if (!closest)
-		closest = plane;
-            if (plane.position == null || !plane.visible)
-		continue;
-            const dist = ol.sphere.getDistance([CenterLon, CenterLat], plane.position);
-            if (dist == null || isNaN(dist))
-		continue;
-            if (closestDistance == null || dist < closestDistance) {
-		closestDistance = dist;
-		closest = plane;
-            }
-	}
+	if (plane.position == null || !plane.visible || plane.onGround || plane.seen > 10)
+	    continue;
+        const dist = ol.sphere.getDistance([CenterLon, CenterLat], plane.position);
+        if (dist == null || isNaN(dist))
+	    continue;
+        if (!closest)
+	    closest = plane;
+        if (closestDistance == null || dist < closestDistance) {
+	    closestDistance = dist;
+	    closest = plane;
+        }
     }
     if (!closest)
         deselectAllPlanes();
